@@ -19,11 +19,11 @@ const DIMS = [
   { key: 'field', col: 8, label: '技術分野', agg: '分野を問わず', skipZero: true, def: '経産省 大学発ベンチャーDBの主力製品・サービス関連技術分野。大学発ベンチャーにだけ付く。' },
 ];
 const BY = Object.fromEntries(DIMS.map(d => [d.key, d]));
-const S = { sel: {}, skip: {}, open: {}, focus: { dim: null, id: null } };
+const S = { sel: {}, skip: {}, open: {}, order: [], focus: { dim: null, id: null } };
 DIMS.forEach(d => { S.sel[d.key] = null; S.skip[d.key] = false; S.open[d.key] = false; });
 
 // ---------- 集計 ----------
-const placed = () => DIMS.filter(d => S.open[d.key]);
+const placed = () => S.order.map(k => BY[k]);
 function matches(r, d) { const v = S.sel[d.key]; if (v === null) return true; return d.bits ? (r[d.col] & (1 << v)) !== 0 : r[d.col] === v; }
 function filterBefore(d) { const P = placed(); const upto = d ? P.slice(0, P.indexOf(d)) : P; return R.filter(r => upto.every(x => matches(r, x))); }
 function counts(rows, d) { const n = new Array(D[d.key].length).fill(0); for (const r of rows) { const v = r[d.col], c = r[9]; if (d.bits) { for (let i = 0; i < n.length; i++) if (v & (1 << i)) n[i] += c; } else n[v] += c; } return n; }
@@ -31,7 +31,7 @@ const sum = a => a.reduce((x, y) => x + y, 0);
 function optName(d, i) { return D[d.key][i]; }
 
 // ---------- URL ----------
-function readHash() { const p = new URLSearchParams(location.hash.slice(1)); const cols = (p.get('cols') || '').split(',').filter(Boolean); DIMS.forEach(d => { S.open[d.key] = cols.includes(d.key); const v = p.get(d.key); S.sel[d.key] = v != null && v !== '' && v !== 'all' ? +v : null; S.skip[d.key] = v === 'all'; }); }
+function readHash() { const p = new URLSearchParams(location.hash.slice(1)); const cols = (p.get('cols') || '').split(',').filter(k => BY[k]); S.order = [...new Set(cols)]; DIMS.forEach(d => { S.open[d.key] = S.order.includes(d.key); const v = p.get(d.key); S.sel[d.key] = v != null && v !== '' && v !== 'all' ? +v : null; S.skip[d.key] = v === 'all'; }); }
 function writeHash() { const p = new URLSearchParams(); const cols = placed().map(d => d.key); if (cols.length) p.set('cols', cols.join(',')); DIMS.forEach(d => { if (S.sel[d.key] !== null) p.set(d.key, S.sel[d.key]); else if (S.skip[d.key]) p.set(d.key, 'all'); }); const h = p.toString(); history.replaceState(null, '', h ? '#' + h : location.pathname); }
 
 // ---------- DOM 構築 ----------
@@ -39,7 +39,7 @@ const palette = $('palette'), board = $('board');
 for (const d of DIMS) {
   const b = document.createElement('button'); b.className = 'pnode dim-' + d.key; b.dataset.dim = d.key;
   b.innerHTML = `<span class="c">${D[d.key].length - (d.skipZero ? 1 : 0)}</span><span class="t">${esc(d.label)}<span class="s" id="pn-${d.key}">未配置</span></span>`;
-  b.addEventListener('click', () => { if (S.open[d.key]) unplace(d); else { S.open[d.key] = true; S.focus = { dim: d.key, id: 'hub' }; } renderAll(); });
+  b.addEventListener('click', () => { if (S.open[d.key]) unplace(d); else place(d); renderAll(); });
   palette.appendChild(b);
   const col = document.createElement('div'); col.className = 'col dim-' + d.key; col.dataset.dim = d.key; col.hidden = true;
   col.innerHTML = `<div class="hubwrap"><button class="hubx" title="外す" aria-label="${esc(d.label)} を外す">×</button><button class="hub" aria-expanded="false">${esc(d.label)}<small>${D[d.key].length - (d.skipZero ? 1 : 0)}</small></button><div class="hubcap" id="cap-${d.key}"></div></div><div class="list" id="list-${d.key}"></div>`;
@@ -52,7 +52,8 @@ for (const d of DIMS) {
   L.addEventListener('mouseout', ev => { const b = ev.target.closest('.row'); if (!b) return; const p = document.querySelector(`.edges path.fan[data-e="fan:${d.key}:${b.dataset.id}"]`); if (p) p.classList.remove('hot'); });
   board.appendChild(col);
 }
-function unplace(d) { S.sel[d.key] = null; S.skip[d.key] = false; S.open[d.key] = false; if (S.focus.dim === d.key) S.focus = { dim: null, id: null }; }
+function place(d) { S.open[d.key] = true; S.order = S.order.filter(k => k !== d.key); S.order.push(d.key); S.focus = { dim: d.key, id: 'hub' }; }
+function unplace(d) { S.sel[d.key] = null; S.skip[d.key] = false; S.open[d.key] = false; S.order = S.order.filter(k => k !== d.key); if (S.focus.dim === d.key) S.focus = { dim: null, id: null }; }
 function select(d, id) {
   if (id === 'all') { S.sel[d.key] = null; S.skip[d.key] = true; S.focus = { dim: d.key, id: 'all' }; }
   else { const v = +id; if (S.sel[d.key] === v) { S.sel[d.key] = null; S.focus = { dim: d.key, id: 'hub' }; } else { S.sel[d.key] = v; S.skip[d.key] = false; S.focus = { dim: d.key, id: v }; } }
@@ -158,7 +159,7 @@ function drawEdges() {
   svg.innerHTML = out.join('');
 }
 
-function renderAll() { writeHash(); DIMS.forEach(renderCol); renderPalette(); renderCrumb(); renderPanel(); requestAnimationFrame(drawEdges); }
+function renderAll() { writeHash(); DIMS.forEach(renderCol); placed().forEach(d => board.appendChild(board.querySelector(`.col[data-dim="${d.key}"]`))); renderPalette(); renderCrumb(); renderPanel(); requestAnimationFrame(drawEdges); }
 window.addEventListener('resize', () => requestAnimationFrame(drawEdges));
 window.addEventListener('hashchange', () => { readHash(); renderAll(); });
 // phone: bottom sheet
@@ -169,5 +170,5 @@ window.addEventListener('hashchange', () => { readHash(); renderAll(); });
   new MutationObserver(() => { if (P.innerHTML === last) return; last = P.innerHTML; const h = P.querySelector('h2'), e = P.querySelector('.eyebrow'); $('sheetbar-t').innerHTML = (e ? `<span class="eyebrow">${esc(e.textContent)}</span>　` : '') + `<b>${esc(h ? h.textContent : '')}</b>`; if (mq.matches && S.focus.dim) { setOpen(true); P.scrollTop = 0; } }).observe(P, { childList: true });
   document.addEventListener('keydown', ev => { if (ev.key === 'Escape') setOpen(false); });
 })();
-readHash(); if (!placed().length && !location.hash) { S.open.year = true; S.open.status = true; }
+readHash(); if (!placed().length && !location.hash) { S.order = ['year', 'status']; S.open.year = true; S.open.status = true; }
 renderAll();
