@@ -23,7 +23,7 @@ if (!id) {  // カテゴリ一覧
   $('title').textContent = cat.label;
   $('tier').textContent = cat.tier === 1 ? '公的コードで確定' : cat.tier === 2 ? '公的文書から推定' : '名称から推定';
   const st = cat.status; $('count').textContent = `${fmt.format(cat.count)} 社（存続 ${fmt.format(st.A || 0)} / 清算結了 ${fmt.format(st.L || 0)} / 合併消滅 ${fmt.format(st.M || 0)} / 登記官閉鎖 ${fmt.format((st.R || 0) + (st.O || 0))}）`;
-  const extraHead = cat.group === 'exit' && cat.id === 'merged' ? '承継先' : cat.id === 'listed' ? '業種' : (cat.group === 'attr' || cat.group === 'field') ? '関連大学' : '備考';
+  const extraHead = cat.group === 'exit' && cat.id === 'merged' ? '承継先' : cat.id === 'listed' ? '業種' : cat.id === 'acquired_web' ? '買い手（年・種別）→出典' : (cat.group === 'attr' || cat.group === 'field') ? '関連大学' : '備考';
   $('extra-head').textContent = extraHead;
   // 全ページを読んでクライアント側で絞り込み (1カテゴリ最大でも数MB)
   const rows = (await Promise.all(Array.from({ length: cat.pages }, (_, p) => fetch(`data/categories/${cat.id}/${p + 1}.json`).then(r => r.json())))).flat();
@@ -42,7 +42,8 @@ if (!id) {  // カテゴリ一覧
     for (const r of f.slice((page - 1) * PAGE, page * PAGE)) {
       const tr = document.createElement('tr');
       const cells = [String(r[1]).normalize('NFKC'), r[2], r[3] + '年', null, String(r[5] || '').normalize('NFKC'), r[0]];
-      cells.forEach((c, i) => { const td = document.createElement('td'); if (i === 3) { const dot = document.createElement('span'); dot.className = 'status ' + r[4]; td.appendChild(dot); td.appendChild(document.createTextNode(STATUS[r[4]] || r[4])); } else if (i === 5) { const a = document.createElement('a'); a.href = `https://www.houjin-bangou.nta.go.jp/henkorireki-johoto.html?selHouzinNo=${c}`; a.target = '_blank'; a.rel = 'noopener'; a.textContent = c; a.title = '国税庁 法人番号公表サイトで見る'; td.appendChild(a); } else td.textContent = c; tr.appendChild(td); });
+      if (r[6]) cells[4] = { text: cells[4], href: r[6] };
+      cells.forEach((c, i) => { const td = document.createElement('td'); if (i === 3) { const dot = document.createElement('span'); dot.className = 'status ' + r[4]; td.appendChild(dot); td.appendChild(document.createTextNode(STATUS[r[4]] || r[4])); } else if (i === 5) { const a = document.createElement('a'); a.href = `https://www.houjin-bangou.nta.go.jp/henkorireki-johoto.html?selHouzinNo=${c}`; a.target = '_blank'; a.rel = 'noopener'; a.textContent = c; a.title = '国税庁 法人番号公表サイトで見る'; td.appendChild(a); } else if (c && typeof c === 'object') { const a = document.createElement('a'); a.href = c.href; a.target = '_blank'; a.rel = 'noopener'; a.textContent = c.text || '出典'; a.title = c.href; td.appendChild(a); } else td.textContent = c; tr.appendChild(td); });
       tb.appendChild(tr);
     }
   };

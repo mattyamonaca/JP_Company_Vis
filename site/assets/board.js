@@ -11,7 +11,7 @@ const DIMS = [
   { key: 'year', col: 0, label: '設立年', agg: '全設立年', def: '法人番号の指定年（国税庁 法人番号公表サイト）。設立登記の数日後に指定される。2026年は8月末まで。' },
   { key: 'kind', col: 2, label: '法人種別', agg: '全種別', def: '法人番号データの法人種別。有限会社は2006年以降新設できないため、組織変更・復活分。' },
   { key: 'status', col: 3, label: '出口', agg: '出口を問わず', def: '登記記録の閉鎖事由（国税庁）と、EDINETの上場区分・書類履歴（金融庁）から判定。「出口なし」は登記が閉鎖されておらず上場歴もない会社で、休眠を含む。' },
-  { key: 'flags', col: 5, label: '属性・イベント', agg: '属性を問わず', bits: true, def: '大学発＝経産省 大学発ベンチャーDB掲載。他社を吸収＝合併の承継先になった会社。上場した＝新規公開時の有価証券届出書か証券コード付き有価証券報告書あり。TOB＝公開買付届出書の対象（2021年9月以降）。上場企業に買収された＝買い手の有価証券報告書の企業結合注記に被取得企業として記載（重要性のある案件のみ）。' },
+  { key: 'flags', col: 5, label: '属性・イベント', agg: '属性を問わず', bits: true, def: '大学発＝経産省 大学発ベンチャーDB掲載。他社を吸収＝合併の承継先になった会社。上場した＝新規公開時の有価証券届出書か証券コード付き有価証券報告書あり。TOB＝公開買付届出書の対象（2021年9月以降）。上場企業に買収された＝買い手の有価証券報告書の企業結合注記に被取得企業として記載（重要性のある案件のみ）。報道あり＝M&Aニュースの見出しに対象として登場（Common Crawl経由、出典リンクつき、推定）。' },
   { key: 'pref', col: 1, label: '都道府県', agg: '全国', def: '本店所在地の都道府県（法人番号データ、2026年8月末時点）。' },
   { key: 'closed_year', col: 4, label: '閉鎖年', agg: '閉鎖年を問わず', def: '登記記録が閉鎖された年。「閉鎖なし」は現存する会社。' },
   { key: 'kw', col: 6, label: '商号キーワード', agg: 'キーワードを問わず', bits: true, def: '商号に含まれる語からの推定。名称に業種を示す語がある会社（約17%）にしか付かず、精度は低い。' },
@@ -100,7 +100,7 @@ function catFor(d, id) {
   const find = (group, label) => cats.find(c => c.group === group && (label == null || c.label === label));
   let c = null;
   if (d.key === 'status') c = { 1: find('exit', '清算して閉鎖した'), 2: find('exit', '合併で消滅した'), 5: find('exit', '上場している'), 6: find('exit', '上場した') }[id];
-  else if (d.key === 'flags') c = [find('attr', '大学発ベンチャー'), find('exit', '他社を吸収した（合併の承継先）'), find('exit', '上場した'), find('exit', 'TOB（公開買付）の対象になった'), find('exit', '上場企業に買収された（株式取得）')][id];
+  else if (d.key === 'flags') c = [find('attr', '大学発ベンチャー'), find('exit', '他社を吸収した（合併の承継先）'), find('exit', '上場した'), find('exit', 'TOB（公開買付）の対象になった'), find('exit', '上場企業に買収された（株式取得）'), find('exit', '買収・子会社化の報道あり')][id];
   else if (d.key === 'kw') c = find('keyword', optName(d, id)); else if (d.key === 'jpx') c = find('industry_jpx33', optName(d, id)); else if (d.key === 'field') c = find('field', optName(d, id));
   if (!c) return null;
   const q = new URLSearchParams({ id: c.id }); const P = placed();

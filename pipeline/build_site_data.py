@@ -103,10 +103,10 @@ def status(r):
 BASE = """SELECT c.houjin_bangou hb, c.name, c.pref_code, substr(c.assigned_on,1,4) y, c.closed_on, c.close_reason_code,
           s.name succ FROM company c LEFT JOIN company s ON s.houjin_bangou=c.successor_houjin_bangou"""
 cats = []
-def emit(cat_id, group, label, sql, params=(), desc='', tier=None, extra=None):
+def emit(cat_id, group, label, sql, params=(), desc='', tier=None, extra=None, url=None):
     rows = con.execute(sql, params).fetchall()
     rows.sort(key=lambda r: (-int(r['y']), r['name']))
-    out_rows = [[r['hb'], r['name'], PREF.get(r['pref_code'], ''), int(r['y']), status(r), (extra(r) if extra else (r['succ'] or ''))] for r in rows]
+    out_rows = [[r['hb'], r['name'], PREF.get(r['pref_code'], ''), int(r['y']), status(r), (extra(r) if extra else (r['succ'] or ''))] + ([url(r)] if url else []) for r in rows]
     pages = max(1, (len(out_rows) + PAGE - 1) // PAGE)
     for p in range(pages): write(f'categories/{cat_id}/{p+1}.json', out_rows[p*PAGE:(p+1)*PAGE])
     st = collections.Counter(r[4] for r in out_rows)
@@ -126,6 +126,10 @@ emit('tob', 'exit', 'TOB（公開買付）の対象になった', BASE + " JOIN 
 emit('acquired', 'exit', '上場企業に買収された（株式取得）', BASE + " JOIN company_scope sc ON sc.houjin_bangou=c.houjin_bangou" + W + " AND sc.acquired_by_listed=1",
      desc='上場企業の有価証券報告書の企業結合注記・キャッシュフロー注記に被取得企業として記載', tier=1,
      extra=lambda r: (lambda x: (x[1] or '') + (f'（{x[0]}年）' if x and x[0] else '') if x else '')(con.execute("SELECT sc.acquired_year, s.name FROM company_scope sc LEFT JOIN company s ON s.houjin_bangou=sc.acquirer_houjin_bangou WHERE sc.houjin_bangou=?", (r['hb'],)).fetchone()))
+emit('acquired_web', 'exit', '買収・子会社化の報道あり', BASE + " JOIN company_scope sc ON sc.houjin_bangou=c.houjin_bangou" + W + " AND sc.acquired_web=1",
+     desc='M&Aニュース（ストライク、M&A Online、日本M&Aセンター）の見出しに対象として登場。Common Crawlのアーカイブから事実と出典のみ抽出', tier=2,
+     extra=lambda r: (lambda x: f"{x[0] or ''}（{x[1] or ''}年・{x[2] or ''}）" if x else '')(con.execute("SELECT acquired_web_buyer, acquired_web_year, acquired_web_kind FROM company_scope WHERE houjin_bangou=?", (r['hb'],)).fetchone()),
+     url=lambda r: (con.execute("SELECT acquired_web_url FROM company_scope WHERE houjin_bangou=?", (r['hb'],)).fetchone() or [''])[0] or '')
 emit('acquirer', 'exit', '他社を吸収した（合併の承継先）', BASE + W + " AND c.houjin_bangou IN (SELECT successor_houjin_bangou FROM company WHERE close_reason_code='11' AND successor_houjin_bangou IS NOT NULL)",
      desc='2016年以降設立の会社を吸収合併で承継した会社。グループ内再編を多く含む', tier=1,
      extra=lambda r: str(con.execute("SELECT COUNT(*) FROM company WHERE successor_houjin_bangou=? AND close_reason_code='11'", (r['hb'],)).fetchone()[0]) + ' 社を吸収')

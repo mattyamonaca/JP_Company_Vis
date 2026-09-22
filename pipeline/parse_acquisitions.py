@@ -33,6 +33,9 @@ def field(t, label_pat, after=60):
 ec2hb = {ec: hb for ec, hb in con.execute("SELECT edinet_code, houjin_bangou FROM snapshot_edinet_filer WHERE houjin_bangou IS NOT NULL")}
 names = collections.defaultdict(list)
 for hb, nm in con.execute("SELECT houjin_bangou, name FROM company"): names[norm(nm)].append(hb)
+CORP2 = re.compile(r'(株式会社|合同会社|有限会社|合資会社|合名会社)')
+norm2 = lambda s: CORP2.sub('', unicodedata.normalize('NFKC', s)).replace(' ', '').replace('　', '').lower()
+uniq = {k for (k,) in con.execute("SELECT norm_name FROM name_count WHERE n=1")}
 rows = []; ndoc = 0
 for f in glob.glob('data/edinet_blocks/*.json.gz'):
     p = json.load(gzip.open(f, 'rt', encoding='utf-8')); d = p['doc']; B = p.get('blocks', {}); ndoc += 1
@@ -56,7 +59,7 @@ for f in glob.glob('data/edinet_blocks/*.json.gz'):
 out = []
 for r in rows:
     tn = r[5]; c = names.get(norm(tn), [])
-    hb = c[0] if len(c) == 1 else None
+    hb = c[0] if len(c) == 1 and norm2(tn) in uniq else None
     out.append(r[:6] + (hb,) + r[7:])
 con.execute("DELETE FROM raw_edinet_acquisition")
 con.executemany("INSERT OR REPLACE INTO raw_edinet_acquisition VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", out)

@@ -14,5 +14,8 @@ python3 pipeline/load_edinet_docs.py "$DB"
 # 上場企業の有報注記 (時間がかかる。中断再開可)
 python3 pipeline/fetch_edinet_blocks.py --since 2017
 python3 pipeline/parse_acquisitions.py "$DB"
+# Common Crawl 由来の M&A 見出し (元サイトには接続しない)
+python3 pipeline/cc_mna_harvest.py --since 2016
+python3 pipeline/load_cc_mna.py "$DB"
 python3 pipeline/build_site_data.py "$DB" site/data   # site/data を作り直す (先に実行)
 python3 pipeline/build_cube.py "$DB" site/data
