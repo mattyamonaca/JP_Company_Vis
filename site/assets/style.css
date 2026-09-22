@@ -44,7 +44,7 @@ a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
 .app{max-width:1440px;margin:0 auto;padding:22px 28px 40px}
 /* top */
 .top{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px 12px;align-items:end;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:18px}
-.top .brand{grid-column:1}.top .crumb{grid-column:1/-1}
+.top .brand{grid-row:1;grid-column:1}.top>.srcbtn{grid-row:1}.top .crumb{grid-row:2;grid-column:1/-1}
 .top h1{font-size:1.35rem;margin-top:4px}
 .top h1 a{color:inherit}
 .crumb{display:flex;flex-wrap:wrap;align-items:center;gap:4px;font-size:13px;min-height:28px}
