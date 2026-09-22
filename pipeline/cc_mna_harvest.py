@@ -32,9 +32,10 @@ def cdx(idx, pattern):
         try: txt = get(base + f'&page={p}').decode()
         except Exception as e: print('CDX ERR', idx, pattern, p, e, flush=True); continue
         for l in txt.splitlines():
-            if l.strip():
-                r = json.loads(l)
-                if r.get('mime', '').startswith('text/html'): recs.append(r)
+            if not l.strip(): continue
+            try: r = json.loads(l)
+            except Exception: continue          # CDX の応答行が途中で切れていることがある
+            if r.get('mime', '').startswith('text/html'): recs.append(r)
         time.sleep(0.5)
     return recs
 def warc_body(rec):
@@ -46,7 +47,7 @@ strip = lambda s: html.unescape(re.sub(r'<[^>]+>', '', s)).replace('　', ' ').s
 KIND = r'(完全子会社化|孫会社化|子会社化|持分法適用関連会社化|関連会社化|株式を取得|株式の一部を取得|株式を追加取得|株式取得|買収|吸収合併|合併|事業を譲受|事業譲受|事業を取得|出資|資本参加|資本業務提携|TOB|公開買付)'
 def parse_headline(t):
     t = re.sub(r'（\d{4}/\d{2}/\d{2}）\s*$', '', t).strip()
-    m = re.match(r'^(?P<buyer>[^、,，]+?)(?:＜(?P<code>\d{4}[A-Z0-9]?)＞)?、(?P<rest>.+)$', t)
+    m = re.match(r'^(?P<buyer>[^、,，]+?)(?:＜(?P<code>[0-9A-Z]{4,5})\s*＞)?、(?P<rest>.+)$', t)
     if not m: return None
     rest = m.group('rest'); k = re.search(KIND, rest)
     if not k: return None

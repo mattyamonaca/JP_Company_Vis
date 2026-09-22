@@ -42,7 +42,8 @@ for line in open('data/cc_mna.jsonl', encoding='utf-8'):
             cand = next(iter(s))
             if founded.get(cand, '9999') <= pub: hb = cand; break   # 設立前の記事に一致する同名法人は別会社
     if hb: matched += 1
-    rows.append((d['url'], d['source'], d.get('published'), d.get('title'), d.get('buyer'), d.get('buyer_code'), d['target'], hb, d['kind'], d.get('captured')))
+    buyer = re.sub(r'＜[^＞]*＞', '', d.get('buyer') or '').strip()
+    rows.append((d['url'], d['source'], d.get('published'), d.get('title'), buyer, d.get('buyer_code'), d['target'], hb, d['kind'], d.get('captured')))
 con.execute("DELETE FROM raw_web_acquisition"); con.executemany("INSERT OR REPLACE INTO raw_web_acquisition VALUES (?,?,?,?,?,?,?,?,?,?)", rows)
 con.execute("UPDATE company_scope SET acquired_web=0, acquired_web_year=NULL, acquired_web_buyer=NULL, acquired_web_url=NULL, acquired_web_kind=NULL")
 con.execute("""UPDATE company_scope SET acquired_web=1,

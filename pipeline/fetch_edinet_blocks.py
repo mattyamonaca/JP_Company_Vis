@@ -30,8 +30,14 @@ for d in todo:
     url = f"{API}/documents/{d['docID']}?" + urllib.parse.urlencode({'type': 5, 'Subscription-Key': api_key()})
     try:
         raw = urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'JP_company_vis/0.1'}), timeout=120).read()
-        z = zipfile.ZipFile(io.BytesIO(raw)); names = [x for x in z.namelist() if '/jpcrp' in x and x.endswith('.csv')]
         out = {'doc': d, 'blocks': {}}
+        if raw[:2] != b'PK':
+            # CSV版が提供されていない書類 (APIは JSON で 404 を返す)。空として記録し、失敗には数えない
+            try: out['api_error'] = json.loads(raw.decode('utf-8', 'ignore')).get('metadata', {})
+            except Exception: out['api_error'] = {'raw': raw[:200].decode('utf-8', 'ignore')}
+            names = []
+        else:
+            z = zipfile.ZipFile(io.BytesIO(raw)); names = [x for x in z.namelist() if '/jpcrp' in x and x.endswith('.csv')]
         if names:
             b = z.read(names[0]); txt = b.decode('utf-16') if b[:2] == b'\xff\xfe' else b.decode('utf-8', 'ignore')
             for r in csv.reader(io.StringIO(txt), delimiter='\t'):
@@ -42,8 +48,8 @@ for d in todo:
         n += 1; fail = 0
     except Exception as e:
         fail += 1; print('ERR', d['docID'], e, flush=True)
-        if fail >= 5: print('連続失敗のため停止'); sys.exit(1)
-        time.sleep(5)
+        if fail >= 30: print('連続失敗のため停止'); sys.exit(1)
+        time.sleep(min(300, 10 * fail))   # ネットワーク断は待って再開 (最大5分)
     if n % 200 == 0 and n: print(f"{n} 件 / 直近 {d['submitDateTime'][:10]} / {time.time()-t0:.0f}s", flush=True)
     time.sleep(a.wait)
 print(f"done: {n} 件取得")
