@@ -17,8 +17,10 @@ def write(path, obj):
     p = os.path.join(out, path); os.makedirs(os.path.dirname(p), exist_ok=True)
     with open(p, 'w', encoding='utf-8') as f: json.dump(obj, f, ensure_ascii=False, separators=(',', ':'))
     return os.path.getsize(p)
-if os.path.isdir(out): shutil.rmtree(out)
-os.makedirs(out)
+# 生成物だけ消す (cube.json は build_cube.py が作るので残す)
+for sub in ('categories',):
+    if os.path.isdir(os.path.join(out, sub)): shutil.rmtree(os.path.join(out, sub))
+os.makedirs(out, exist_ok=True)
 
 S = {'snapshot_date': snapshot, 'years': YEARS}
 # 1. 設立数 (指定年×法人種別, 全法人)
