@@ -1,37 +1,31 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="assets/style.css"><title>日本の新設法人ライフサイクル | 2016年以降に生まれた会社はどうなったか</title><meta name="description" content="国税庁の法人番号データなど公的データだけで、2016年以降に設立された日本の会社の設立・存続・清算・合併・上場を可視化します。"></head><body>
-<header class="site"><div class="wrap"><a class="brand" href="./">日本の新設法人ライフサイクル</a><nav><a href="./" aria-current="page">サマリー</a><a href="category.html" >カテゴリ別一覧</a><a href="about.html" >データと方法</a></nav></div></header>
-<main class="wrap">
-<h1 class="visually-hidden">サマリー</h1>
-<section class="explorer" id="explorer">
-<div class="explorer-head"><h2 style="margin:0">絞り込み</h2><button class="ghost" id="reset" type="button">絞り込みをリセット</button></div>
-<div class="hero-row">
-  <div class="tile hero"><div class="label">条件に当てはまる会社</div><div class="value" id="hero">–</div><div class="sub" id="hero-sub"></div></div>
-  <div class="tile"><div class="label">存続（登記あり）</div><div class="value" id="t-alive">–</div></div>
-  <div class="tile"><div class="label">登記記録が閉鎖</div><div class="value" id="t-closed">–</div><div class="sub" id="t-closed-sub"></div></div>
-  <div class="tile"><div class="label">上場した</div><div class="value" id="t-listed">–</div><div class="sub" id="t-listed-sub"></div></div>
-  <div class="tile"><div class="label">大学発ベンチャー</div><div class="value" id="t-univ">–</div></div>
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JP Company Vis | 2016年以降に設立された会社の出口</title>
+<meta name="description" content="国税庁の法人番号データ、金融庁EDINET、経産省の公開データだけで、2016年以降に設立された日本の会社の設立・存続・清算・合併・上場を探索します。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="assets/style.css"></head><body><div class="app">
+<header class="top">
+  <div class="brand"><span class="eyebrow">JP Company Vis / 法人番号 <span class="snap">2026-08-31</span> / EDINET 2026-09-22 / 2016年以降設立</span><h1><a href="./">設立年 → 法人種別 → 出口 → 属性 → 都道府県 → 閉鎖年 → 商号キーワード → 上場業種 → 技術分野</a></h1></div>
+  <nav class="crumb" id="crumb" aria-label="現在の選択"></nav>
+  <a class="srcbtn" href="category.html">カテゴリ別一覧</a>
+  <a class="srcbtn" href="about.html">データと方法</a>
+</header>
+<div class="board-wrap">
+  <aside class="palette" id="palette" aria-label="次元ノード"><span class="eyebrow">ノード</span></aside>
+  <div class="board-scroll">
+    <div class="board-empty" id="board-empty">左のノードをクリックすると、ここに列が並びます。</div>
+    <div class="board" id="board"><svg class="edges" id="edges" aria-hidden="true"></svg></div>
+  </div>
+  <aside class="panel" id="panel" aria-live="polite"></aside>
 </div>
-<div id="facets"></div>
-</section>
+<button class="sheetbar" id="sheetbar" type="button" aria-controls="panel" aria-expanded="false"><span class="sbt" id="sheetbar-t">パネル</span><span class="sbx" id="sheetbar-x">開く</span></button>
 
-<h2>分布</h2>
+<h2 class="section-h">全体（絞り込み非連動）</h2>
 <div class="grid2">
-  <div class="card"><h3>設立年 × 出口</h3><div id="x-year"></div></div>
-  <div class="card"><h3>閉鎖年 × 事由</h3><div id="x-closed"></div></div>
-  <div class="card"><h3>都道府県</h3><div id="x-pref"></div></div>
-  <div class="card"><h3>商号キーワード（推定）</h3><div id="x-kw"></div></div>
-  <div class="card" id="x-jpx-card"><h3>上場企業の業種（EDINET）</h3><div id="x-jpx"></div></div>
-  <div class="card" id="x-field-card"><h3>大学発の技術分野</h3><div id="x-field"></div></div>
-</div>
-
-<h2>全体（絞り込み非連動）</h2>
 <div class="card"><h3>年別 新規法人数（全法人種別）</h3><div id="c-founded"></div></div>
-
-<div class="card" style="margin-top:16px"><h3>経過月数 × 生存率（設立年別）</h3><div id="c-survival"></div></div>
-
-<div class="card" style="margin-top:16px"><h3>吸収合併の承継先 上位</h3><div id="c-succ"></div></div>
-
-</main>
-<footer class="site"><div class="wrap"><p>出典：国税庁法人番号公表サイト（国税庁）、EDINET（金融庁）、大学発ベンチャーデータベース（経済産業省）を加工して作成（PDL1.0）。法人番号データ：<span class="snap"></span>。<a href="about.html">データと方法</a></p></div></footer>
-<script type="module" src="assets/explorer.js"></script>
+<div class="card"><h3>経過月数 × 生存率（設立年別）</h3><div id="c-survival"></div></div>
+<div class="card"><h3>吸収合併の承継先 上位</h3><div id="c-succ"></div></div>
+</div>
+<footer>出典：国税庁法人番号公表サイト（国税庁）、EDINET（金融庁）、大学発ベンチャーデータベース（経済産業省）を加工して作成（PDL1.0）。<a href="about.html">データと方法</a> · <a href="https://github.com/mattyamonaca/JP_Company_Vis">ソースコード</a></footer>
+</div>
+<script type="module" src="assets/board.js"></script>
 <script type="module" src="assets/main.js"></script></body></html>

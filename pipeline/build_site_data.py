@@ -1,7 +1,8 @@
 """SQLite → site/data/*.json  (完全静的サイト用の集計・カテゴリ別一覧)
 usage: python build_site_data.py <db_path> <site/data dir>
 """
-import sys, sqlite3, json, os, datetime, collections, shutil
+import sys, sqlite3, json, os, datetime, collections, shutil, hashlib
+slug = lambda t: hashlib.md5(t.encode('utf-8')).hexdigest()[:8]
 db_path, out = sys.argv[1], sys.argv[2]
 con = sqlite3.connect(db_path); con.row_factory = sqlite3.Row
 PREF = {f"{i:02d}": n for i, n in enumerate(
@@ -127,9 +128,9 @@ emit('univ', 'attr', '大学発ベンチャー', BASE + " JOIN company_scope sc 
      desc='経産省 大学発ベンチャーデータベース掲載企業', tier=1,
      extra=lambda r: (con.execute("SELECT university FROM raw_meti_univ_startup WHERE houjin_bangou=? LIMIT 1", (r['hb'],)).fetchone() or [''])[0] or '')
 for r in q("SELECT DISTINCT tag_value v FROM company_tag WHERE tag_type='industry_jpx33'"):
-    emit('jpx33-' + str(abs(hash(r['v'])) % 10**6), 'industry_jpx33', r['v'], BASE + " JOIN company_tag t ON t.houjin_bangou=c.houjin_bangou" + W + " AND t.tag_type='industry_jpx33' AND t.tag_value=?", (r['v'],), desc='上場企業の業種（EDINET 提出者業種）', tier=1)
+    emit('jpx33-' + slug(r['v']), 'industry_jpx33', r['v'], BASE + " JOIN company_tag t ON t.houjin_bangou=c.houjin_bangou" + W + " AND t.tag_type='industry_jpx33' AND t.tag_value=?", (r['v'],), desc='上場企業の業種（EDINET 提出者業種）', tier=1)
 for r in q("SELECT DISTINCT tag_value v FROM company_tag WHERE tag_type='field'"):
-    emit('field-' + str(abs(hash(r['v'])) % 10**6), 'field', r['v'], BASE + " JOIN company_tag t ON t.houjin_bangou=c.houjin_bangou" + W + " AND t.tag_type='field' AND t.tag_value=?", (r['v'],), desc='大学発ベンチャーの主力製品・サービス関連技術分野', tier=2,
+    emit('field-' + slug(r['v']), 'field', r['v'], BASE + " JOIN company_tag t ON t.houjin_bangou=c.houjin_bangou" + W + " AND t.tag_type='field' AND t.tag_value=?", (r['v'],), desc='大学発ベンチャーの主力製品・サービス関連技術分野', tier=2,
          extra=lambda r: (con.execute("SELECT university FROM raw_meti_univ_startup WHERE houjin_bangou=? LIMIT 1", (r['hb'],)).fetchone() or [''])[0] or '')
 for r in q("SELECT DISTINCT tag_value v, tag_label l FROM company_tag WHERE tag_type='keyword'"):
     emit('kw-' + r['v'], 'keyword', r['l'], BASE + " JOIN company_tag t ON t.houjin_bangou=c.houjin_bangou" + W + " AND t.tag_type='keyword' AND t.tag_value=?", (r['v'],), desc='商号に含まれる語からの推定（精度は低い）', tier=3)

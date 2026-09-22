@@ -1,6 +1,15 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="assets/style.css"><title>データと方法 | 日本の新設法人ライフサイクル</title></head><body>
-<header class="site"><div class="wrap"><a class="brand" href="./">日本の新設法人ライフサイクル</a><nav><a href="./" >サマリー</a><a href="category.html" >カテゴリ別一覧</a><a href="about.html" aria-current="page">データと方法</a></nav></div></header>
-<main class="wrap">
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>データと方法 | JP Company Vis</title>
+<meta name="description" content="国税庁の法人番号データ、金融庁EDINET、経産省の公開データだけで、2016年以降に設立された日本の会社の設立・存続・清算・合併・上場を探索します。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="assets/style.css"></head><body><div class="app">
+<header class="top">
+  <div class="brand"><span class="eyebrow">JP Company Vis / 法人番号 <span class="snap">2026-08-31</span> / EDINET 2026-09-22 / 2016年以降設立</span><h1><a href="./">設立年 → 法人種別 → 出口 → 属性 → 都道府県 → 閉鎖年 → 商号キーワード → 上場業種 → 技術分野</a></h1></div>
+  <nav class="crumb" id="crumb" aria-label="現在の選択"></nav>
+  <a class="srcbtn" href="category.html">カテゴリ別一覧</a>
+  <a class="srcbtn cur" href="about.html">データと方法</a>
+</header>
+<main class="page">
 <h1>データと方法</h1>
 <p class="lead">このサイトは、無料で入手でき、かつ国の機関が公開しているデータだけを使っています。企業検索機能は持たず、事前に集計した結果とカテゴリ別の一覧のみを提供します。</p>
 <h2>使っているデータ</h2>
@@ -32,5 +41,5 @@
 <h2>再現方法</h2>
 <p>集計に使ったスクリプトとスキーマは <a href="https://github.com/mattyamonaca/JP_Company_Vis">GitHub リポジトリ</a> にあります。法人番号の全件データ（zip 約270MB）をダウンロードし、<code>pipeline/run_all.sh</code> を実行すると <code>site/data/</code> が再生成されます。</p>
 </main>
-<footer class="site"><div class="wrap"><p>出典：国税庁法人番号公表サイト（国税庁）、EDINET（金融庁）、大学発ベンチャーデータベース（経済産業省）を加工して作成（PDL1.0）。法人番号データ：<span class="snap"></span>。<a href="about.html">データと方法</a></p></div></footer>
-</body></html>
+<footer>出典：国税庁法人番号公表サイト（国税庁）、EDINET（金融庁）、大学発ベンチャーデータベース（経済産業省）を加工して作成（PDL1.0）。<a href="about.html">データと方法</a> · <a href="https://github.com/mattyamonaca/JP_Company_Vis">ソースコード</a></footer>
+</div></body></html>

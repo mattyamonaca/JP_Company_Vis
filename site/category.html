@@ -1,17 +1,23 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="assets/style.css"><title>カテゴリ別の企業一覧 | 日本の新設法人ライフサイクル</title></head><body>
-<header class="site"><div class="wrap"><a class="brand" href="./">日本の新設法人ライフサイクル</a><nav><a href="./" >サマリー</a><a href="category.html" aria-current="page">カテゴリ別一覧</a><a href="about.html" >データと方法</a></nav></div></header>
-<main class="wrap">
-<section id="cat-index" class="hidden">
-<h1>カテゴリ別の企業一覧</h1>
-<div class="catgroups" id="groups"></div>
-</section>
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>カテゴリ別の企業一覧 | JP Company Vis</title>
+<meta name="description" content="国税庁の法人番号データ、金融庁EDINET、経産省の公開データだけで、2016年以降に設立された日本の会社の設立・存続・清算・合併・上場を探索します。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="assets/style.css"></head><body><div class="app">
+<header class="top">
+  <div class="brand"><span class="eyebrow">JP Company Vis / 法人番号 <span class="snap">2026-08-31</span> / EDINET 2026-09-22 / 2016年以降設立</span><h1><a href="./">設立年 → 法人種別 → 出口 → 属性 → 都道府県 → 閉鎖年 → 商号キーワード → 上場業種 → 技術分野</a></h1></div>
+  <nav class="crumb" id="crumb" aria-label="現在の選択"></nav>
+  <a class="srcbtn cur" href="category.html">カテゴリ別一覧</a>
+  <a class="srcbtn" href="about.html">データと方法</a>
+</header>
+<main class="page">
+<section id="cat-index" class="hidden"><h1>カテゴリ別の企業一覧</h1><div class="catgroups" id="groups"></div></section>
 <section id="cat-page" class="hidden">
 <h1 id="title"></h1>
 <p class="note"><span class="badge" id="tier"></span> <span id="count"></span></p>
 <div class="filters"><label>設立年 <select id="f-year"><option value="">すべて</option></select></label><label>都道府県 <select id="f-pref"><option value="">すべて</option></select></label><label>状態 <select id="f-status"><option value="">すべて</option></select></label><span class="note" id="shown"></span></div>
 <table class="data"><thead><tr><th>名称</th><th>都道府県</th><th>設立年</th><th>状態</th><th id="extra-head"></th><th>法人番号</th></tr></thead><tbody id="rows"></tbody></table>
-<div class="pager"><button class="ghost" id="prev">前へ</button><span id="pg"></span><button class="ghost" id="next">次へ</button></div>
-</section>
-</main>
-<footer class="site"><div class="wrap"><p>出典：国税庁法人番号公表サイト（国税庁）、EDINET（金融庁）、大学発ベンチャーデータベース（経済産業省）を加工して作成（PDL1.0）。法人番号データ：<span class="snap"></span>。<a href="about.html">データと方法</a></p></div></footer>
+<div class="pager"><button class="ghost" id="prev">前へ</button><span id="pg" class="mono"></span><button class="ghost" id="next">次へ</button></div>
+</section></main>
+<footer>出典：国税庁法人番号公表サイト（国税庁）、EDINET（金融庁）、大学発ベンチャーデータベース（経済産業省）を加工して作成（PDL1.0）。<a href="about.html">データと方法</a> · <a href="https://github.com/mattyamonaca/JP_Company_Vis">ソースコード</a></footer>
+</div>
 <script type="module" src="assets/category.js"></script></body></html>

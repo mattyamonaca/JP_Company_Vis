@@ -6,7 +6,7 @@ const $ = id => document.getElementById(id);
 const sum = a => a.reduce((x, y) => x + (y || 0), 0);
 const S = await (await fetch('data/summary.json')).json();
 const years = S.years, partial = years[years.length - 1];
-document.querySelectorAll('.snap').forEach(e => e.textContent = S.snapshot_date.replace(/-(\d\d)-(\d\d)/, '年$1月$2日') + '時点');
+document.querySelectorAll('.snap').forEach(e => e.textContent = S.snapshot_date);
 
 const fk = S.founded_by_year_kind; const kinds = ['株式会社', '合同会社'];
 const other = years.map(y => sum(Object.entries(fk[y]).filter(([k]) => !kinds.includes(k)).map(([, v]) => v)));

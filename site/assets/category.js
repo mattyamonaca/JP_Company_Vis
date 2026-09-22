@@ -19,7 +19,7 @@ if (!id) {  // カテゴリ一覧
 } else {
   const cat = cats.find(c => c.id === id); if (!cat) { $('title').textContent = 'カテゴリが見つかりません'; throw new Error('no category'); }
   $('cat-page').classList.remove('hidden');
-  document.title = `${cat.label} | 日本の新設法人ライフサイクル`;
+  document.title = `${cat.label} | JP Company Vis`;
   $('title').textContent = cat.label;
   $('tier').textContent = cat.tier === 1 ? '公的コードで確定' : cat.tier === 2 ? '公的文書から推定' : '名称から推定';
   const st = cat.status; $('count').textContent = `${fmt.format(cat.count)} 社（存続 ${fmt.format(st.A || 0)} / 清算結了 ${fmt.format(st.L || 0)} / 合併消滅 ${fmt.format(st.M || 0)} / 登記官閉鎖 ${fmt.format((st.R || 0) + (st.O || 0))}）`;
@@ -31,6 +31,7 @@ if (!id) {  // カテゴリ一覧
   for (const y of Array.from(new Set(rows.map(r => r[3]))).sort((a, b) => b - a)) yearSel.add(new Option(y + '年', y));
   for (const p of Array.from(new Set(rows.map(r => r[2]))).filter(Boolean).sort()) prefSel.add(new Option(p, p));
   for (const [k, v] of Object.entries(STATUS)) stSel.add(new Option(v, k));
+  for (const [k, el] of [['year', yearSel], ['pref', prefSel], ['status', stSel]]) { const v = params.get(k); if (v && [...el.options].some(o => o.value === v)) el.value = v; }
   const PAGE = 100; let page = 1;
   const filtered = () => rows.filter(r => (!yearSel.value || String(r[3]) === yearSel.value) && (!prefSel.value || r[2] === prefSel.value) && (!stSel.value || r[4] === stSel.value));
   const render = () => {
