@@ -114,6 +114,15 @@ emit('listed', 'exit', '上場している', BASE + " JOIN company_scope sc ON s
      extra=lambda r: (con.execute("SELECT tag_label FROM company_tag WHERE houjin_bangou=? AND tag_type='industry_jpx33'", (r['hb'],)).fetchone() or [''])[0])
 emit('merged', 'exit', '合併で消滅した', BASE + W + " AND c.close_reason_code='11'", desc='登記記録の閉鎖事由が「合併による解散等」。相手先は承継先法人番号から', tier=1)
 emit('liquidated', 'exit', '清算して閉鎖した', BASE + W + " AND c.close_reason_code IN ('01','31')", desc='登記記録の閉鎖事由が「清算の結了等」', tier=1)
+emit('ipo', 'exit', '上場した', BASE + " JOIN company_scope sc ON sc.houjin_bangou=c.houjin_bangou" + W + " AND sc.has_ipo_filing=1",
+     desc='EDINETに新規公開時の有価証券届出書、または証券コード付きの有価証券報告書がある会社', tier=1,
+     extra=lambda r: (lambda x: f"上場 {x[0]}年" + ("（現在は非上場）" if not x[1] else '') if x else '')(con.execute("SELECT ipo_year, is_listed FROM company_scope WHERE houjin_bangou=?", (r['hb'],)).fetchone()))
+emit('tob', 'exit', 'TOB（公開買付）の対象になった', BASE + " JOIN company_scope sc ON sc.houjin_bangou=c.houjin_bangou" + W + " AND sc.is_tob_target=1",
+     desc='EDINETの公開買付届出書で対象会社になった会社（届出書の縦覧期間の都合で直近5年分）', tier=1,
+     extra=lambda r: (lambda x: f"TOB {x[0]}年" if x and x[0] else '')(con.execute("SELECT tob_year FROM company_scope WHERE houjin_bangou=?", (r['hb'],)).fetchone()))
+emit('acquirer', 'exit', '他社を吸収した（合併の承継先）', BASE + W + " AND c.houjin_bangou IN (SELECT successor_houjin_bangou FROM company WHERE close_reason_code='11' AND successor_houjin_bangou IS NOT NULL)",
+     desc='2016年以降設立の会社を吸収合併で承継した会社。グループ内再編を多く含む', tier=1,
+     extra=lambda r: str(con.execute("SELECT COUNT(*) FROM company WHERE successor_houjin_bangou=? AND close_reason_code='11'", (r['hb'],)).fetchone()[0]) + ' 社を吸収')
 emit('univ', 'attr', '大学発ベンチャー', BASE + " JOIN company_scope sc ON sc.houjin_bangou=c.houjin_bangou" + W + " AND sc.is_univ_startup=1",
      desc='経産省 大学発ベンチャーデータベース掲載企業', tier=1,
      extra=lambda r: (con.execute("SELECT university FROM raw_meti_univ_startup WHERE houjin_bangou=? LIMIT 1", (r['hb'],)).fetchone() or [''])[0] or '')

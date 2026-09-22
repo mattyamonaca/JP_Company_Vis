@@ -8,8 +8,8 @@ const D = cube.dims, R = cube.rows;
 const DIMS = [
   { key: 'year', col: 0, label: '設立年', help: '法人番号の指定年。2026年は8月末まで' },
   { key: 'kind', col: 2, label: '法人種別' },
-  { key: 'status', col: 3, label: '出口・現在の状態', help: '上場＝EDINETコードリストで現在上場。閉鎖は登記記録の閉鎖事由（2026年8月末時点）' },
-  { key: 'flags', col: 5, label: '属性', help: '大学発＝経産省データベース掲載。吸収した側＝他社を合併で承継した会社', bits: true },
+  { key: 'status', col: 3, label: '出口・現在の状態', help: '上場中＝EDINETコードリストで現在上場。上場後非上場＝新規公開の届出はあるが現在は上場区分なし（TOB・上場廃止など）。閉鎖は登記記録の閉鎖事由' },
+  { key: 'flags', col: 5, label: '属性・出口イベント', help: '大学発＝経産省DB掲載。吸収した側＝他社を合併で承継。上場した＝EDINETに新規公開時の有価証券届出書あり。TOB＝公開買付届出書の対象', bits: true },
   { key: 'pref', col: 1, label: '都道府県', collapsible: true },
   { key: 'closed_year', col: 4, label: '閉鎖した年', help: '登記記録が閉鎖された年', collapsible: true },
   { key: 'kw', col: 6, label: '商号キーワード（推定）', help: '商号に含まれる語からの推定。複数選択は「いずれかを含む」。精度は低い', bits: true },
@@ -34,7 +34,6 @@ for (const d of DIMS) {
   const head = document.createElement(d.collapsible ? 'summary' : 'div'); head.className = 'facet-head';
   const h = document.createElement('span'); h.className = 'facet-label'; h.textContent = d.label; head.appendChild(h);
   const badge = document.createElement('span'); badge.className = 'facet-sel'; head.appendChild(badge); d.badge = badge;
-  if (d.help) { const s = document.createElement('span'); s.className = 'facet-help'; s.textContent = d.help; head.appendChild(s); }
   box.appendChild(head);
   const chips = document.createElement('div'); chips.className = 'chips'; box.appendChild(chips);
   chipEls[d.key] = D[d.key].map((name, i) => {
@@ -60,9 +59,9 @@ function update() {
   const rows = R.filter(r => passesAll(r, null)); const total = rows.reduce((a, r) => a + r[9], 0);
   $('hero').textContent = fmt.format(total); $('hero-sub').textContent = `全体 ${fmt.format(cube.total)} 社の ${pct(total / cube.total)}`;
   const by = (col, n, mask) => { const a = new Array(n).fill(0); for (const r of rows) { if (mask) { for (let i = 0; i < n; i++) if (r[col] & (1 << i)) a[i] += r[9]; } else a[r[col]] += r[9]; } return a; };
-  const st = by(3, 6); const alive = st[0] + st[5]; $('t-alive').textContent = fmt.format(alive); $('t-closed').textContent = fmt.format(total - alive);
+  const st = by(3, 7); const alive = st[0] + st[5] + st[6]; $('t-alive').textContent = fmt.format(alive); $('t-closed').textContent = fmt.format(total - alive);
   $('t-closed-sub').textContent = total ? pct((total - alive) / total) + ' が登記閉鎖' : '';
-  const fl = by(5, 2, true); $('t-listed').textContent = fmt.format(st[5]); $('t-univ').textContent = fmt.format(fl[0]);
+  const fl = by(5, 4, true); $('t-listed').textContent = fmt.format(fl[2]); $('t-listed-sub').textContent = `うち現在上場 ${fmt.format(st[5])}`; $('t-univ').textContent = fmt.format(fl[0]);
   // ファセットの件数
   for (const d of DIMS) {
     const cnt = facetCounts(d); const s = sel[d.key];
@@ -72,7 +71,7 @@ function update() {
   // 分布チャート
   const SL = ['存続', '清算結了', '合併で消滅', 'その他の閉鎖']; const SC = [C.s1, C.muted, C.s2, C.s8];
   const yearStatus = SL.map(() => new Array(D.year.length).fill(0));
-  const sIdx = s => s === 5 ? 0 : Math.min(s, 3);
+  const sIdx = s => s >= 5 ? 0 : Math.min(s, 3);
   for (const r of rows) yearStatus[sIdx(r[3])][r[0]] += r[9];
   stackedColumns($('x-year'), { categories: D.year.map((y, i) => i === D.year.length - 1 ? y + '*' : y), series: SL.map((n, i) => ({ name: n, color: SC[i], values: yearStatus[i] })), unit: '社' });
   const cyStatus = SL.slice(1).map(() => new Array(D.closed_year.length - 1).fill(0));
@@ -86,6 +85,5 @@ function update() {
   $('x-jpx-card').classList.toggle('hidden', !jx.length); if (jx.length) hBars($('x-jpx'), { items: jx, color: C.s1, unit: '社' });
   const fx = by(8, D.field.length).map((v, i) => ({ label: D.field[i], value: v })).filter((x, i) => i > 0 && x.value).sort((a, b) => b.value - a.value).slice(0, 12);
   $('x-field-card').classList.toggle('hidden', !fx.length); if (fx.length) hBars($('x-field'), { items: fx, color: C.s3, unit: '社' });
-  const kd = by(2, D.kind.length); $('x-kind-note').textContent = D.kind.map((k, i) => `${k} ${fmt.format(kd[i])}`).filter((_, i) => kd[i]).join(' / ');
 }
 readHash(); update(); window.addEventListener('hashchange', () => { readHash(); update(); });

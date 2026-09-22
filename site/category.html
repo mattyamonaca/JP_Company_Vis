@@ -3,18 +3,15 @@
 <main class="wrap">
 <section id="cat-index" class="hidden">
 <h1>カテゴリ別の企業一覧</h1>
-<p class="lead">2016年以降に設立された会社を、Exitの種類・属性・業種で分けて一覧にしています。「公的コードで確定」以外のカテゴリは推定を含みます。</p>
 <div class="catgroups" id="groups"></div>
 </section>
 <section id="cat-page" class="hidden">
 <h1 id="title"></h1>
-<p class="lead" id="desc"></p>
-<p class="note">分類の根拠：<span id="tier"></span>　｜　<span id="count"></span></p>
+<p class="note"><span class="badge" id="tier"></span> <span id="count"></span></p>
 <div class="filters"><label>設立年 <select id="f-year"><option value="">すべて</option></select></label><label>都道府県 <select id="f-pref"><option value="">すべて</option></select></label><label>状態 <select id="f-status"><option value="">すべて</option></select></label><span class="note" id="shown"></span></div>
 <table class="data"><thead><tr><th>名称</th><th>都道府県</th><th>設立年</th><th>状態</th><th id="extra-head"></th><th>法人番号</th></tr></thead><tbody id="rows"></tbody></table>
 <div class="pager"><button class="ghost" id="prev">前へ</button><span id="pg"></span><button class="ghost" id="next">次へ</button></div>
-<p class="note"><a href="category.html">← カテゴリ一覧に戻る</a></p>
 </section>
 </main>
-<footer class="site"><div class="wrap"><p>出典：国税庁法人番号公表サイト（国税庁）、EDINET閲覧（提出）サイト（金融庁）、大学発ベンチャーデータベース（経済産業省）を加工して作成。各データは公共データ利用規約（PDL1.0、CC BY 4.0互換）に基づき利用しています。法人番号データは <span class="snap"></span>のものです。</p><p>本サイトの内容は各府省庁によって保証されたものではありません。集計・分類には推定を含みます。詳細は<a href="about.html">データと方法</a>を参照してください。</p></div></footer>
+<footer class="site"><div class="wrap"><p>出典：国税庁法人番号公表サイト（国税庁）、EDINET（金融庁）、大学発ベンチャーデータベース（経済産業省）を加工して作成（PDL1.0）。法人番号データ：<span class="snap"></span>。<a href="about.html">データと方法</a></p></div></footer>
 <script type="module" src="assets/category.js"></script></body></html>

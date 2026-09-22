@@ -3,7 +3,7 @@
 2016年以降に設立された日本の会社の「一生」（設立 → 存続 → 清算 / 合併 / 上場）を、無料の公的データだけで可視化する完全静的サイト。
 
 - 企業検索はなし。事前集計したサマリーと、カテゴリ別の企業一覧のみ。
-- データ: 国税庁 法人番号 全件データ、金融庁 EDINETコードリスト、経産省 大学発ベンチャーデータベース（いずれも PDL1.0 / CC BY 4.0互換）。
+- データ: 国税庁 法人番号 全件データ、金融庁 EDINET（コードリスト・API書類一覧）、経産省 大学発ベンチャーデータベース（いずれも PDL1.0 / CC BY 4.0互換）。
 - ホスティング: Cloudflare Pages（`site/` をそのまま配信）。
 
 ## 構成
@@ -15,6 +15,10 @@ pipeline/  データ取り込みと集計 (Python 3 標準ライブラリ + open
   load_edinet_codelist.py EDINETコードリスト → 上場区分・33業種タグ
   load_univ_startups.py   大学発ベンチャーDB(Excel) → 属性・技術分野タグ
   tag_keywords.py         商号キーワード → tier3 タグ
+  edinet_api.py           EDINET API v2 クライアント（キーは環境変数 EDINET_API_KEY か ~/.persona/.env）
+  fetch_edinet_docs.py    書類一覧を日付ごとに取得（中断再開可）→ data/edinet_docs.jsonl
+  load_edinet_docs.py     新規公開届出・証券コード付き有報・公開買付届出 → 上場した / TOB対象 フラグ
+  build_cube.py           属性の組み合わせ × 社数 → site/data/cube.json（トップの絞り込み用）
   build_site_data.py      SQLite → site/data/*.json
   run_all.sh              上記を順に実行
 site/      静的サイト (HTML + ES modules、ビルド不要)

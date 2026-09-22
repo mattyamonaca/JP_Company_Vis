@@ -12,7 +12,6 @@ if (!id) {  // カテゴリ一覧
   for (const g of Object.keys(GROUPS)) {
     const list = cats.filter(c => c.group === g).sort((a, b) => b.count - a.count); if (!list.length) continue;
     const card = document.createElement('div'); card.className = 'card'; const h = document.createElement('h3'); h.textContent = GROUPS[g]; card.appendChild(h);
-    const p = document.createElement('p'); p.className = 'sub'; p.textContent = list[0].description || ''; card.appendChild(p);
     const ul = document.createElement('div'); ul.className = 'catlist';
     for (const c of list) { const a = document.createElement('a'); a.href = `category.html?id=${encodeURIComponent(c.id)}`; const s = document.createElement('span'); s.textContent = c.label; const n = document.createElement('span'); n.className = 'n'; n.textContent = fmt.format(c.count) + ' 社'; a.append(s, n); ul.appendChild(a); }
     card.appendChild(ul); wrap.appendChild(card);
@@ -21,7 +20,7 @@ if (!id) {  // カテゴリ一覧
   const cat = cats.find(c => c.id === id); if (!cat) { $('title').textContent = 'カテゴリが見つかりません'; throw new Error('no category'); }
   $('cat-page').classList.remove('hidden');
   document.title = `${cat.label} | 日本の新設法人ライフサイクル`;
-  $('title').textContent = cat.label; $('desc').textContent = `${GROUPS[cat.group]}。${cat.description || ''}`;
+  $('title').textContent = cat.label;
   $('tier').textContent = cat.tier === 1 ? '公的コードで確定' : cat.tier === 2 ? '公的文書から推定' : '名称から推定';
   const st = cat.status; $('count').textContent = `${fmt.format(cat.count)} 社（存続 ${fmt.format(st.A || 0)} / 清算結了 ${fmt.format(st.L || 0)} / 合併消滅 ${fmt.format(st.M || 0)} / 登記官閉鎖 ${fmt.format((st.R || 0) + (st.O || 0))}）`;
   const extraHead = cat.group === 'exit' && cat.id === 'merged' ? '承継先' : cat.id === 'listed' ? '業種' : (cat.group === 'attr' || cat.group === 'field') ? '関連大学' : '備考';

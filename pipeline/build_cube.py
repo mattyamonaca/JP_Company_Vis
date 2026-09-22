@@ -9,7 +9,7 @@ con = sqlite3.connect(db_path)
 PREF = "北海道 青森県 岩手県 宮城県 秋田県 山形県 福島県 茨城県 栃木県 群馬県 埼玉県 千葉県 東京都 神奈川県 新潟県 富山県 石川県 福井県 山梨県 長野県 岐阜県 静岡県 愛知県 三重県 滋賀県 京都府 大阪府 兵庫県 奈良県 和歌山県 鳥取県 島根県 岡山県 広島県 山口県 徳島県 香川県 愛媛県 高知県 福岡県 佐賀県 長崎県 熊本県 大分県 宮崎県 鹿児島県 沖縄県".split()
 YEARS = [str(y) for y in range(2016, 2027)]
 KINDS = [('301', '株式会社'), ('305', '合同会社'), ('303', '合名会社'), ('304', '合資会社'), ('302', '有限会社')]
-STATUS = [('A', '出口なし（存続）'), ('L', '清算結了'), ('M', '吸収合併された'), ('R', '登記官による閉鎖'), ('O', 'その他の閉鎖'), ('P', '上場している')]
+STATUS = [('A', '出口なし（存続）'), ('L', '清算結了'), ('M', '吸収合併された'), ('R', '登記官による閉鎖'), ('O', 'その他の閉鎖'), ('P', '上場している'), ('Q', '上場したが現在は非上場')]
 kind_ix = {k: i for i, (k, _) in enumerate(KINDS)}
 # タグ辞書
 kw = [r for r in con.execute("SELECT DISTINCT tag_value, tag_label FROM company_tag WHERE tag_type='keyword' ORDER BY tag_value")]
@@ -23,7 +23,7 @@ for hb, t, v in con.execute("SELECT houjin_bangou, tag_type, tag_value FROM comp
     if t == 'keyword': tags[hb][0] |= 1 << kw_ix[v]
     elif t == 'industry_jpx33': tags[hb][1] = jpx_ix[v]
     elif t == 'field': tags[hb][2] = fld_ix[v]
-scope = {hb: (l or 0, u or 0) for hb, l, u in con.execute("SELECT houjin_bangou, is_listed, is_univ_startup FROM company_scope")}
+scope = {hb: (l or 0, u or 0, i or 0, t or 0) for hb, l, u, i, t in con.execute("SELECT houjin_bangou, is_listed, is_univ_startup, has_ipo_filing, is_tob_target FROM company_scope")}
 # 他社を吸収した側 (合併の承継先になった会社)
 acquirers = {r[0] for r in con.execute("SELECT DISTINCT successor_houjin_bangou FROM company WHERE close_reason_code='11' AND successor_houjin_bangou IS NOT NULL")}
 def status(closed, reason):
@@ -36,8 +36,10 @@ for hb, a, pref, kind, closed, reason in con.execute("""SELECT houjin_bangou, as
     y = int(a[:4]) - 2016
     p = int(pref) - 1 if pref and pref.isdigit() and 1 <= int(pref) <= 47 else 47   # 47 = 不明/国外
     cy = (int(closed[:4]) - 2015) if closed else 0                                    # 0 = 閉鎖なし, 1 = 2015 ...
-    l, u = scope.get(hb, (0, 0)); flags = (1 if u else 0) | (2 if hb in acquirers else 0)
-    stt = status(closed, reason); stt = 5 if (l and stt == 0) else stt
+    l, u, ip, tb = scope.get(hb, (0, 0, 0, 0)); flags = (1 if u else 0) | (2 if hb in acquirers else 0) | (4 if ip else 0) | (8 if tb else 0)
+    stt = status(closed, reason)
+    if stt == 0 and l: stt = 5
+    elif stt == 0 and ip: stt = 6
     km, j, f = tags.get(hb, (0, 0, 0))
     cube[(y, p, kind_ix[kind], stt, cy, flags, km, j, f)] += 1
 rows = [list(k) + [v] for k, v in cube.items()]
@@ -45,7 +47,7 @@ rows.sort()
 obj = {'total': n, 'dims': {
     'year': YEARS, 'pref': PREF + ['不明・国外'], 'kind': [k[1] for k in KINDS], 'status': [s[1] for s in STATUS],
     'closed_year': ['閉鎖なし'] + [str(2015 + i) for i in range(1, 12)],
-    'flags': ['大学発ベンチャー', '他社を吸収した（合併の承継先）'], 'kw': [k[1] for k in kw], 'jpx': ['（上場企業以外）'] + jpx, 'field': ['（大学発以外）'] + fld},
+    'flags': ['大学発ベンチャー', '他社を吸収した（合併の承継先）', '上場した（新規公開の届出あり）', 'TOB（公開買付）の対象になった'], 'kw': [k[1] for k in kw], 'jpx': ['（上場企業以外）'] + jpx, 'field': ['（大学発以外）'] + fld},
     'rows': rows}
 os.makedirs(out, exist_ok=True)
 with open(os.path.join(out, 'cube.json'), 'w', encoding='utf-8') as fh: json.dump(obj, fh, ensure_ascii=False, separators=(',', ':'))

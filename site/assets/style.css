@@ -104,3 +104,6 @@ details.facet[open] > summary::before { content: '▾'; }
 @media (max-width: 800px) { .hero-row { grid-template-columns: repeat(2, 1fr); } .hero-row .tile.hero { grid-column: span 2; } }
 .hero-row .tile.hero { grid-column: auto; }
 @media (max-width: 800px) { .hero-row .tile.hero { grid-column: span 2; } }
+
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+main.wrap > h2:first-of-type { margin-top: 20px; }
