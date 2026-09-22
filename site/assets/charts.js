@@ -87,7 +87,7 @@ export function hBars(container, { items, color, unit = '', valueFmt = fmt.forma
     el('line', { x1: L, x2: L, y1: T, y2: H - 8, class: 'baseline' }, svg);
     items.forEach((it, i) => {
       const yy = T + i * row + (row - 16) / 2, w = Math.max(0, it.value / max * pw), r = Math.min(4, w);
-      const lab = el('text', { x: L - 8, y: yy + 12, 'text-anchor': 'end', class: 'lbl' }, svg); const nl = String(it.label).normalize('NFKC'); lab.textContent = nl.length > 14 ? nl.slice(0, 13) + '…' : nl;
+      const lab = el('text', { x: L - 8, y: yy + 12, 'text-anchor': 'end', class: 'lbl' }, svg); const nl = String(it.label).normalize('NFKC'); const mc = Math.max(6, Math.floor((L - 10) / 12)); lab.textContent = nl.length > mc ? nl.slice(0, mc - 1) + '…' : nl;
       const bar = el('path', { d: `M${L},${yy}H${L + w - r}Q${L + w},${yy} ${L + w},${yy + r}V${yy + 16 - r}Q${L + w},${yy + 16} ${L + w - r},${yy + 16}H${L}Z`, fill: color, class: 'mark' }, svg);
       const val = el('text', { x: L + w + 6, y: yy + 12 }, svg); val.textContent = valueFmt(it.value) + (it.suffix || '');
       const hit = el('rect', { x: 0, y: T + i * row, width: W, height: row, class: 'hit', tabindex: '0' }, svg);

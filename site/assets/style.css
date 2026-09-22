@@ -81,3 +81,26 @@ table.data td.n, table.data th.n { text-align: right; font-variant-numeric: tabu
 footer.site { margin: 48px 0 24px; padding-top: 16px; border-top: 1px solid var(--border); color: var(--muted); font-size: 12px; }
 footer.site p { margin: 4px 0; }
 @media (max-width: 600px) { h1 { font-size: 22px; } .tile.hero { grid-column: auto; } .tile.hero .value { font-size: 36px; } }
+/* ---- 絞り込みパネル ---- */
+.explorer { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 16px 0 24px; }
+.explorer-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.facet { padding: 10px 0; border-top: 1px solid var(--grid); }
+.facet:first-of-type { border-top: 0; }
+.facet-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; cursor: default; }
+details.facet > summary { cursor: pointer; list-style: none; }
+details.facet > summary::before { content: '▸'; color: var(--muted); margin-right: 6px; font-size: 12px; }
+details.facet[open] > summary::before { content: '▾'; }
+.facet-label { font-weight: 600; font-size: 14px; }
+.facet-sel { color: var(--link); font-size: 12px; }
+.facet-help { color: var(--muted); font-size: 12px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 13px; padding: 4px 10px; border: 1px solid var(--border); border-radius: 16px; background: var(--page); color: var(--ink); cursor: pointer; }
+.chip .n { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.chip:hover { border-color: var(--axis); }
+.chip.on { background: var(--s1); border-color: var(--s1); color: #fff; }
+.chip.on .n { color: rgba(255,255,255,0.85); }
+.chip.zero { opacity: 0.45; }
+.hero-row { display: grid; grid-template-columns: 2fr repeat(4, 1fr); gap: 12px; margin: 14px 0 6px; }
+@media (max-width: 800px) { .hero-row { grid-template-columns: repeat(2, 1fr); } .hero-row .tile.hero { grid-column: span 2; } }
+.hero-row .tile.hero { grid-column: auto; }
+@media (max-width: 800px) { .hero-row .tile.hero { grid-column: span 2; } }

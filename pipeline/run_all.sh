@@ -9,3 +9,4 @@ python3 pipeline/load_edinet_codelist.py data/Edinetcode.zip "$DB" "$(date +%F)"
 .venv/bin/python pipeline/load_univ_startups.py data/Univ-venture_db_data.xlsx "$DB" "$(date +%F)"
 python3 pipeline/tag_keywords.py "$DB"
 python3 pipeline/build_site_data.py "$DB" site/data
+python3 pipeline/build_cube.py "$DB" site/data
