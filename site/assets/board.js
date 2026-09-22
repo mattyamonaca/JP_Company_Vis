@@ -11,10 +11,10 @@ const DIMS = [
   { key: 'year', col: 0, label: '設立年', agg: '全設立年', def: '法人番号の指定年（国税庁 法人番号公表サイト）。設立登記の数日後に指定される。2026年は8月末まで。' },
   { key: 'kind', col: 2, label: '法人種別', agg: '全種別', def: '法人番号データの法人種別。有限会社は2006年以降新設できないため、組織変更・復活分。' },
   { key: 'status', col: 3, label: '出口', agg: '出口を問わず', def: '登記記録の閉鎖事由（国税庁）と、EDINETの上場区分・書類履歴（金融庁）から判定。「出口なし」は登記が閉鎖されておらず上場歴もない会社で、休眠を含む。' },
-  { key: 'flags', col: 5, label: '属性・イベント', agg: '属性を問わず', bits: true, def: '大学発＝経産省 大学発ベンチャーDB掲載。他社を吸収＝合併の承継先になった会社。上場した＝新規公開時の有価証券届出書か証券コード付き有価証券報告書あり。TOB＝公開買付届出書の対象（2021年9月以降）。上場企業に買収された＝買い手の有価証券報告書の企業結合注記に被取得企業として記載（重要性のある案件のみ）。報道あり＝M&Aニュースの見出しに対象として登場（Common Crawl経由、出典リンクつき、推定）。' },
+  { key: 'flags', col: 5, label: '属性・イベント', short: '属性', agg: '属性を問わず', bits: true, def: '大学発＝経産省 大学発ベンチャーDB掲載。他社を吸収＝合併の承継先になった会社。上場した＝新規公開時の有価証券届出書か証券コード付き有価証券報告書あり。TOB＝公開買付届出書の対象（2021年9月以降）。上場企業に買収された＝買い手の有価証券報告書の企業結合注記に被取得企業として記載（重要性のある案件のみ）。報道あり＝M&Aニュースの見出しに対象として登場（Common Crawl経由、出典リンクつき、推定）。' },
   { key: 'pref', col: 1, label: '都道府県', agg: '全国', def: '本店所在地の都道府県（法人番号データ、2026年8月末時点）。' },
-  { key: 'closed_year', col: 4, label: '閉鎖年', agg: '閉鎖年を問わず', def: '登記記録が閉鎖された年。「閉鎖なし」は現存する会社。' },
-  { key: 'kw', col: 6, label: '商号キーワード', agg: 'キーワードを問わず', bits: true, def: '商号に含まれる語からの推定。名称に業種を示す語がある会社（約17%）にしか付かず、精度は低い。' },
+  { key: 'closed_year', col: 4, label: '閉鎖年', short: '閉鎖年', agg: '閉鎖年を問わず', def: '登記記録が閉鎖された年。「閉鎖なし」は現存する会社。' },
+  { key: 'kw', col: 6, label: '商号キーワード', short: '商号KW', agg: 'キーワードを問わず', bits: true, def: '商号に含まれる語からの推定。名称に業種を示す語がある会社（約17%）にしか付かず、精度は低い。' },
   { key: 'jpx', col: 7, label: '上場業種', agg: '業種を問わず', skipZero: true, def: 'EDINETコードリストの提出者業種（33業種）。現在上場している会社にだけ付く。' },
   { key: 'field', col: 8, label: '技術分野', agg: '分野を問わず', skipZero: true, def: '経産省 大学発ベンチャーDBの主力製品・サービス関連技術分野。大学発ベンチャーにだけ付く。' },
 ];
@@ -42,7 +42,7 @@ for (const d of DIMS) {
   b.addEventListener('click', () => { if (S.open[d.key]) unplace(d); else place(d); renderAll(); });
   palette.appendChild(b);
   const col = document.createElement('div'); col.className = 'col dim-' + d.key; col.dataset.dim = d.key; col.hidden = true;
-  col.innerHTML = `<div class="hubwrap"><button class="hubx" title="外す" aria-label="${esc(d.label)} を外す">×</button><button class="hub" aria-expanded="false">${esc(d.label)}<small>${D[d.key].length - (d.skipZero ? 1 : 0)}</small></button><div class="hubcap" id="cap-${d.key}"></div></div><div class="list" id="list-${d.key}"></div>`;
+  col.innerHTML = `<div class="hubwrap"><button class="hubx" title="外す" aria-label="${esc(d.label)} を外す">×</button><button class="hub" aria-expanded="false">${esc(d.short || d.label)}<small>${D[d.key].length - (d.skipZero ? 1 : 0)}</small></button><div class="hubcap" id="cap-${d.key}"></div></div><div class="list" id="list-${d.key}"></div>`;
   col.querySelector('.hubx').addEventListener('click', ev => { ev.stopPropagation(); unplace(d); renderAll(); });
   col.querySelector('.hub').addEventListener('click', () => { S.focus = { dim: d.key, id: 'hub' }; renderAll(); });
   const L = col.querySelector('.list');
