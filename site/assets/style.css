@@ -41,7 +41,7 @@ p.lead { color: var(--ink-2); margin: 0 0 8px; max-width: 760px; }
 .tile .label { color: var(--ink-2); font-size: 13px; }
 .tile .value { font-size: 30px; font-weight: 600; line-height: 1.2; margin-top: 2px; }
 .tile .sub { color: var(--muted); font-size: 12px; margin-top: 4px; }
-.tile.hero .value { font-size: 48px; }
+.tile.hero { grid-column: span 2; } .tile.hero .value { font-size: 48px; }
 .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 16px 12px; }
 .card .sub { color: var(--muted); font-size: 12px; margin: 0 0 10px; }
@@ -80,4 +80,4 @@ table.data td.n, table.data th.n { text-align: right; font-variant-numeric: tabu
 .status.A { background: var(--s3); } .status.L { background: var(--muted); } .status.M { background: var(--s2); } .status.R, .status.O { background: var(--axis); }
 footer.site { margin: 48px 0 24px; padding-top: 16px; border-top: 1px solid var(--border); color: var(--muted); font-size: 12px; }
 footer.site p { margin: 4px 0; }
-@media (max-width: 600px) { h1 { font-size: 22px; } .tile.hero .value { font-size: 36px; } }
+@media (max-width: 600px) { h1 { font-size: 22px; } .tile.hero { grid-column: auto; } .tile.hero .value { font-size: 36px; } }
