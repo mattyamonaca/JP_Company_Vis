@@ -1,0 +1,42 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="assets/style.css"><title>日本の新設法人ライフサイクル | 2016年以降に生まれた会社はどうなったか</title><meta name="description" content="国税庁の法人番号データなど公的データだけで、2016年以降に設立された日本の会社の設立・存続・清算・合併・上場を可視化します。"></head><body>
+<header class="site"><div class="wrap"><a class="brand" href="./">日本の新設法人ライフサイクル</a><nav><a href="./" aria-current="page">サマリー</a><a href="category.html" >カテゴリ別一覧</a><a href="about.html" >データと方法</a></nav></div></header>
+<main class="wrap">
+<h1>2016年以降に生まれた会社は、いまどうなっているか</h1>
+<p class="lead">国税庁の法人番号データ（<span class="snap"></span>）を軸に、EDINET・経済産業省の公開データだけを使って、日本の新設法人の「一生」を追います。企業検索はありません。全体の傾向と、カテゴリ別の企業一覧を提供します。</p>
+<div class="tiles">
+  <div class="tile hero"><div class="label">2016年以降に設立された会社</div><div class="value" id="hero">–</div><div class="sub">株式会社・合同会社・合名会社・合資会社。法人番号の指定日ベース</div></div>
+  <div class="tile"><div class="label">うち登記記録が閉鎖</div><div class="value" id="t-closed">–</div><div class="sub" id="t-closed-sub"></div></div>
+  <div class="tile"><div class="label"><a id="l-listed" href="category.html">上場している</a></div><div class="value" id="t-listed">–</div><div class="sub">EDINETコードリストの上場区分</div></div>
+  <div class="tile"><div class="label"><a id="l-merged" href="category.html">合併で消滅した</a></div><div class="value" id="t-merged">–</div><div class="sub">承継先の法人番号あり</div></div>
+  <div class="tile"><div class="label"><a id="l-univ" href="category.html">大学発ベンチャー</a></div><div class="value" id="t-univ">–</div><div class="sub">経産省DB掲載のうち2016年以降設立</div></div>
+</div>
+
+<h2>誕生：毎年どれだけの法人が生まれているか</h2>
+<div class="card"><h3>年別の法人番号新規指定数（法人種別）</h3><p class="sub">全法人種別。「その他の法人」は一般社団法人・NPO・外国会社など。* の年は8月末までの数</p><div id="c-founded"></div></div>
+
+<h2>死亡：閉鎖はいつ、どの事由で起きるか</h2>
+<div class="grid2">
+  <div class="card"><h3>設立年別の閉鎖数（閉鎖事由別）</h3><p class="sub">2026年8月末時点で登記記録が閉鎖している会社。古いコホートほど累積が大きい</p><div id="c-cohort"></div><p class="note" id="cohort-note"></p></div>
+  <div class="card"><h3>閉鎖が発生した年（閉鎖事由別）</h3><p class="sub">2016年以降に設立された会社の閉鎖を、閉鎖年で集計</p><div id="c-closures"></div></div>
+</div>
+<div class="card" style="margin-top:16px"><h3>設立からの経過月数と生存率（設立年別）</h3><p class="sub">「登記記録が閉鎖されていない」＝生存。休眠会社は含まれるため、実際の事業継続率はこれより低い</p><div id="c-survival"></div></div>
+
+<h2>Exit：上場と合併</h2>
+<div class="grid2">
+  <div class="card"><h3>上場している会社の業種</h3><p class="sub">2016年以降設立で現在上場。EDINET 提出者業種（33業種）</p><div id="c-listed-ind"></div></div>
+  <div class="card"><h3>上場している会社の設立年</h3><p class="sub">設立から上場までが短い会社ほど右に現れる</p><div id="c-listed-year"></div></div>
+  <div class="card"><h3>合併で吸収した側のランキング</h3><p class="sub">2016年以降設立の会社を「合併による解散」で承継した法人。グループ内再編を多く含む</p><div id="c-succ"></div></div>
+  <div class="card"><h3>都道府県別の設立数</h3><p class="sub">2016年以降設立の会社。ホバーで閉鎖率</p><div id="c-pref"></div><p class="note" id="pref-note"></p></div>
+</div>
+
+<h2>何をしている会社か</h2>
+<p class="lead">未上場企業の公式な業種コードは公開データに存在しません。ここでは（1）上場企業のEDINET業種、（2）大学発ベンチャーDBの技術分野、（3）商号に含まれる語、の3層で推定しています。</p>
+<div class="grid2">
+  <div class="card"><h3>大学発ベンチャー：関連大学</h3><p class="sub">2016年以降設立の掲載企業。複数大学に関連する場合は代表1件</p><div id="c-univ"></div><p class="note" id="univ-note"></p></div>
+  <div class="card"><h3>大学発ベンチャー：主力製品・サービスの技術分野</h3><p class="sub">経産省 大学発ベンチャーデータベースの分類</p><div id="c-univ-field"></div></div>
+</div>
+<div class="card" style="margin-top:16px"><h3>商号に含まれる語からの業種推定</h3><p class="sub" id="kw-note"></p><div id="c-kw"></div></div>
+<p class="note" style="margin-top:20px"><a id="l-liq" href="category.html">カテゴリ別の企業一覧はこちら</a></p>
+</main>
+<footer class="site"><div class="wrap"><p>出典：国税庁法人番号公表サイト（国税庁）、EDINET閲覧（提出）サイト（金融庁）、大学発ベンチャーデータベース（経済産業省）を加工して作成。各データは公共データ利用規約（PDL1.0、CC BY 4.0互換）に基づき利用しています。法人番号データは <span class="snap"></span>のものです。</p><p>本サイトの内容は各府省庁によって保証されたものではありません。集計・分類には推定を含みます。詳細は<a href="about.html">データと方法</a>を参照してください。</p></div></footer>
+<script type="module" src="assets/main.js"></script></body></html>

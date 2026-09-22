@@ -1,0 +1,33 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="assets/style.css"><title>データと方法 | 日本の新設法人ライフサイクル</title></head><body>
+<header class="site"><div class="wrap"><a class="brand" href="./">日本の新設法人ライフサイクル</a><nav><a href="./" >サマリー</a><a href="category.html" >カテゴリ別一覧</a><a href="about.html" aria-current="page">データと方法</a></nav></div></header>
+<main class="wrap">
+<h1>データと方法</h1>
+<p class="lead">このサイトは、無料で入手でき、かつ国の機関が公開しているデータだけを使っています。企業検索機能は持たず、事前に集計した結果とカテゴリ別の一覧のみを提供します。</p>
+<h2>使っているデータ</h2>
+<table class="data"><thead><tr><th>データ</th><th>発行元</th><th>使い方</th><th>利用条件</th></tr></thead><tbody>
+<tr><td><a href="https://www.houjin-bangou.nta.go.jp/">法人番号公表サイト 全件データ</a></td><td>国税庁</td><td>法人の誕生（法人番号指定日）、商号・所在地、登記記録の閉鎖日と事由（清算の結了、合併による解散、登記官による閉鎖）、合併の承継先法人番号</td><td>PDL1.0（CC BY 4.0互換）</td></tr>
+<tr><td><a href="https://disclosure2.edinet-fsa.go.jp/">EDINET コードリスト</a></td><td>金融庁</td><td>上場区分、提出者業種（33業種）、法人番号との対応</td><td>PDL1.0</td></tr>
+<tr><td><a href="https://www.meti.go.jp/policy/innovation_corp/univ-startupsdb.html">大学発ベンチャーデータベース</a></td><td>経済産業省</td><td>大学発ベンチャーの企業名・法人番号・関連大学・技術分野。連絡先などの個人情報は取り込んでいません</td><td>PDL1.0</td></tr>
+</tbody></table>
+<h2>定義と限界</h2>
+<ul>
+<li><strong>「設立」は法人番号の指定日</strong>です。設立登記から数日以内に指定されるため実務上はほぼ一致します。2015年10月5日に既存法人へ一括指定された約426万件は設立年が分からないため、集計から除いています。</li>
+<li><strong>「閉鎖」は登記記録の閉鎖</strong>です。休眠したまま登記が残っている会社は「存続」に含まれます。法務局による休眠会社の整理（登記官による閉鎖）は最後の登記から12年後に行われます。このため、ここでの生存率は実際の事業継続率より高めです。</li>
+<li><strong>倒産（破産・民事再生）の種別は追えません。</strong>官報の破産公告は電子化後90日で閲覧できなくなり、機械的な取得も禁止されているためです。閉鎖事由「清算の結了等」には自主廃業と倒産後の清算の両方が含まれます。</li>
+<li><strong>株式譲渡によるM&amp;Aは見えません。</strong>会社が存続するため登記に痕跡が残りません。ここで「合併で消滅」としているのは吸収合併・新設合併のみで、グループ内の組織再編を多く含みます。</li>
+<li><strong>上場情報はEDINETコードリストの取得日時点</strong>のものです。上場廃止した会社は「上場している」に含まれません。</li>
+<li><strong>業種は3層で推定</strong>しています。（1）上場企業のEDINET業種は公的コードで確定、（2）大学発ベンチャーDBの技術分野は公的文書に基づく、（3）商号に含まれる語からの推定は精度が低く、名称に業種を示す語がある会社（全体の約17%）にしか付きません。</li>
+</ul>
+<h2>使っていないデータと理由</h2>
+<ul>
+<li>日本取引所グループ（JPX）の新規上場・上場廃止一覧、TDnet、J-Quants：利用規約で二次利用・再配信が禁止されているため。</li>
+<li>日本年金機構の適用事業所検索（従業員数）：検索結果の転載・二次利用が禁止されているため。</li>
+<li>官報：クローラによる取得が禁止され、破産公告は90日で非公開になるため。</li>
+<li>適格請求書発行事業者公表サイト：登録番号の有効性確認以外の目的での第三者提供が制限されているため。</li>
+<li>民間のスタートアップデータベース：無料で再配布できる一次データではないため。</li>
+</ul>
+<h2>再現方法</h2>
+<p>集計に使ったスクリプトとスキーマは <a href="https://github.com/mattyamonaca/JP_Company_Vis">GitHub リポジトリ</a> にあります。法人番号の全件データ（zip 約270MB）をダウンロードし、<code>pipeline/run_all.sh</code> を実行すると <code>site/data/</code> が再生成されます。</p>
+</main>
+<footer class="site"><div class="wrap"><p>出典：国税庁法人番号公表サイト（国税庁）、EDINET閲覧（提出）サイト（金融庁）、大学発ベンチャーデータベース（経済産業省）を加工して作成。各データは公共データ利用規約（PDL1.0、CC BY 4.0互換）に基づき利用しています。法人番号データは <span class="snap"></span>のものです。</p><p>本サイトの内容は各府省庁によって保証されたものではありません。集計・分類には推定を含みます。詳細は<a href="about.html">データと方法</a>を参照してください。</p></div></footer>
+</body></html>
