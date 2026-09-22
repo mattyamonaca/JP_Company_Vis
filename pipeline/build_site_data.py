@@ -123,6 +123,9 @@ emit('ipo', 'exit', '上場した', BASE + " JOIN company_scope sc ON sc.houjin_
 emit('tob', 'exit', 'TOB（公開買付）の対象になった', BASE + " JOIN company_scope sc ON sc.houjin_bangou=c.houjin_bangou" + W + " AND sc.is_tob_target=1",
      desc='EDINETの公開買付届出書で対象会社になった会社（届出書の縦覧期間の都合で直近5年分）', tier=1,
      extra=lambda r: (lambda x: f"TOB {x[0]}年" if x and x[0] else '')(con.execute("SELECT tob_year FROM company_scope WHERE houjin_bangou=?", (r['hb'],)).fetchone()))
+emit('acquired', 'exit', '上場企業に買収された（株式取得）', BASE + " JOIN company_scope sc ON sc.houjin_bangou=c.houjin_bangou" + W + " AND sc.acquired_by_listed=1",
+     desc='上場企業の有価証券報告書の企業結合注記・キャッシュフロー注記に被取得企業として記載', tier=1,
+     extra=lambda r: (lambda x: (x[1] or '') + (f'（{x[0]}年）' if x and x[0] else '') if x else '')(con.execute("SELECT sc.acquired_year, s.name FROM company_scope sc LEFT JOIN company s ON s.houjin_bangou=sc.acquirer_houjin_bangou WHERE sc.houjin_bangou=?", (r['hb'],)).fetchone()))
 emit('acquirer', 'exit', '他社を吸収した（合併の承継先）', BASE + W + " AND c.houjin_bangou IN (SELECT successor_houjin_bangou FROM company WHERE close_reason_code='11' AND successor_houjin_bangou IS NOT NULL)",
      desc='2016年以降設立の会社を吸収合併で承継した会社。グループ内再編を多く含む', tier=1,
      extra=lambda r: str(con.execute("SELECT COUNT(*) FROM company WHERE successor_houjin_bangou=? AND close_reason_code='11'", (r['hb'],)).fetchone()[0]) + ' 社を吸収')

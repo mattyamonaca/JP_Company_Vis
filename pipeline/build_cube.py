@@ -23,7 +23,7 @@ for hb, t, v in con.execute("SELECT houjin_bangou, tag_type, tag_value FROM comp
     if t == 'keyword': tags[hb][0] |= 1 << kw_ix[v]
     elif t == 'industry_jpx33': tags[hb][1] = jpx_ix[v]
     elif t == 'field': tags[hb][2] = fld_ix[v]
-scope = {hb: (l or 0, u or 0, i or 0, t or 0) for hb, l, u, i, t in con.execute("SELECT houjin_bangou, is_listed, is_univ_startup, has_ipo_filing, is_tob_target FROM company_scope")}
+scope = {hb: (l or 0, u or 0, i or 0, t or 0, q or 0) for hb, l, u, i, t, q in con.execute("SELECT houjin_bangou, is_listed, is_univ_startup, has_ipo_filing, is_tob_target, acquired_by_listed FROM company_scope")}
 # 他社を吸収した側 (合併の承継先になった会社)
 acquirers = {r[0] for r in con.execute("SELECT DISTINCT successor_houjin_bangou FROM company WHERE close_reason_code='11' AND successor_houjin_bangou IS NOT NULL")}
 def status(closed, reason):
@@ -36,7 +36,7 @@ for hb, a, pref, kind, closed, reason in con.execute("""SELECT houjin_bangou, as
     y = int(a[:4]) - 2016
     p = int(pref) - 1 if pref and pref.isdigit() and 1 <= int(pref) <= 47 else 47   # 47 = 不明/国外
     cy = (int(closed[:4]) - 2015) if closed else 0                                    # 0 = 閉鎖なし, 1 = 2015 ...
-    l, u, ip, tb = scope.get(hb, (0, 0, 0, 0)); flags = (1 if u else 0) | (2 if hb in acquirers else 0) | (4 if ip else 0) | (8 if tb else 0)
+    l, u, ip, tb, aq = scope.get(hb, (0, 0, 0, 0, 0)); flags = (1 if u else 0) | (2 if hb in acquirers else 0) | (4 if ip else 0) | (8 if tb else 0) | (16 if aq else 0)
     stt = status(closed, reason)
     if stt == 0 and l: stt = 5
     elif stt == 0 and ip: stt = 6
@@ -47,7 +47,7 @@ rows.sort()
 obj = {'total': n, 'dims': {
     'year': YEARS, 'pref': PREF + ['不明・国外'], 'kind': [k[1] for k in KINDS], 'status': [s[1] for s in STATUS],
     'closed_year': ['閉鎖なし'] + [str(2015 + i) for i in range(1, 12)],
-    'flags': ['大学発ベンチャー', '他社を吸収した（合併の承継先）', '上場した（新規公開の届出あり）', 'TOB（公開買付）の対象になった'], 'kw': [k[1] for k in kw], 'jpx': ['（上場企業以外）'] + jpx, 'field': ['（大学発以外）'] + fld},
+    'flags': ['大学発ベンチャー', '他社を吸収した（合併の承継先）', '上場した（新規公開の届出あり）', 'TOB（公開買付）の対象になった', '上場企業に買収された（株式取得）'], 'kw': [k[1] for k in kw], 'jpx': ['（上場企業以外）'] + jpx, 'field': ['（大学発以外）'] + fld},
     'rows': rows}
 os.makedirs(out, exist_ok=True)
 with open(os.path.join(out, 'cube.json'), 'w', encoding='utf-8') as fh: json.dump(obj, fh, ensure_ascii=False, separators=(',', ':'))

@@ -11,5 +11,8 @@ python3 pipeline/tag_keywords.py "$DB"
 # EDINET 書類一覧 (要 EDINET_API_KEY。縦覧期間の都合で取得できるのは直近10年分)
 python3 pipeline/fetch_edinet_docs.py 2016-09-19 "$(date +%F)"
 python3 pipeline/load_edinet_docs.py "$DB"
+# 上場企業の有報注記 (時間がかかる。中断再開可)
+python3 pipeline/fetch_edinet_blocks.py --since 2017
+python3 pipeline/parse_acquisitions.py "$DB"
 python3 pipeline/build_site_data.py "$DB" site/data   # site/data を作り直す (先に実行)
 python3 pipeline/build_cube.py "$DB" site/data
