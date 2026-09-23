@@ -146,7 +146,7 @@ for r in q("SELECT DISTINCT tag_value v, tag_label l FROM company_tag WHERE tag_
 write('categories/index.json', cats)
 write('meta.json', {'generated_at': datetime.datetime.now().isoformat(timespec='seconds'), 'snapshot_date': snapshot,
                     'sources': q("SELECT * FROM source"), 'runs': q("SELECT source_id, snapshot_date, retrieved_at, row_count FROM ingest_run"),
-                    'status_codes': {'A': '存続', 'L': '清算結了', 'M': '合併消滅', 'R': '登記官閉鎖', 'O': 'その他閉鎖'}})
+                    'status_codes': {'A': '存続（休眠含む）', 'L': '清算結了', 'M': '合併消滅', 'R': '登記官閉鎖', 'O': 'その他閉鎖'}})
 total = sum(os.path.getsize(os.path.join(dp, f)) for dp, _, fs in os.walk(out) for f in fs)
 nfiles = sum(len(fs) for _, _, fs in os.walk(out))
 print(f"カテゴリ {len(cats)} 件 / ファイル {nfiles} / 合計 {total/1e6:.1f} MB")
